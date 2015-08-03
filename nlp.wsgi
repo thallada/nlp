@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.append('/var/www/buzzfeed-haiku-generator')
+sys.path.append('/var/www/nlp')
 
 import logging
 logging.basicConfig(stream=sys.stderr)
