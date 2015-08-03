@@ -32,7 +32,7 @@ class PoemGenerator():
         self.words = []
         self.all_words = []
         self.inflect_engine = inflect.engine()
-        with open('buzzfeed_facebook_statuses.csv', newline='') as statuses:
+        with open('/var/www/buzzfeed-haiku-generator/buzzfeed_facebook_statuses.csv', newline='', encoding='utf-8') as statuses:
             reader = csv.reader(statuses, delimiter=',')
             for row in reader:
                 if 'via buzzfeed ' not in row[1].lower():  # only English
