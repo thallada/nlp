@@ -10,7 +10,7 @@ def home():
     return redirect('http://git.hallada.net/nlp/')
 
 
-@app.route("/buzzfeed-haiku-generator")
+@app.route("/buzzfeed-haiku-generator/")
 def buzzfeed_haiku_generator():
     haiku = generator.generate_haiku()
     return render_template('buzzfeed-haiku-generator.html', haiku=haiku)
