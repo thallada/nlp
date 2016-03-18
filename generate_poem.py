@@ -5,6 +5,7 @@ import string
 #import pickle
 import csv
 import inflect
+import jellyfish
 from count_syllables import count_syllables
 #from get_titles import read_titles
 #from nltk.corpus import cmudict
@@ -67,13 +68,30 @@ class PoemGenerator():
         word = random.choice(self.bigrams)[0]
         self.markov(word, 15)
 
+    def pick_rhyming_word(self, targets, words):
+        target_metaphones = [jellyfish.metaphone(target) for target in targets]
+        metaphones = [(word, jellyfish.metaphone(word)) for word in words]
+        for i in range(max([len(target_m) for target_m in target_metaphones]), 0, -1):
+            matching_metaphones = list()
+            for target_metaphone in target_metaphones:
+                if i > len(target_metaphone):
+                    matching_metaphones.append([(word, meta) for word, meta in metaphones if
+                                                meta.endswith(target_metaphone[(i*-1):])])
+            if matching_metaphones:
+                return random.choice(matching_metaphones)[0]
+        return None
+
     def haiku_line(self, line, current_syllables, next_words,
-                   target_syllables):
+                   target_syllables, last_words=[]):
         if next_words == []:
             # this branch failed
             return None
         else:
-            word = random.choice(next_words)
+            word = None
+            if line and last_words:
+                word = self.pick_rhyming_word(last_words, next_words)
+            if word is None:
+                word = random.choice(next_words)
         new_line = line[:]
         new_line.append(word)
         new_syllables = sum(map(count_syllables, new_line))
@@ -99,15 +117,15 @@ class PoemGenerator():
 
     def generate_haiku(self):
         haiku = ''
-        first = self.haiku_line([], 0, self.all_words, 5)
+        first = self.haiku_line([], 0, self.all_words, 5, [])
         haiku = haiku + ' '.join(first) + '\n'
         next_words = [freq[0] for freq in self.cfd[first[-1]].items()
                       if not self.only_punctuation.match(freq[0])]
-        second = self.haiku_line([], 0, next_words, 7)
+        second = self.haiku_line([], 0, next_words, 7, first[-1])
         haiku = haiku + ' '.join(second) + '\n'
         next_words = [freq[0] for freq in self.cfd[second[-1]].items()
                       if not self.only_punctuation.match(freq[0])]
-        third = self.haiku_line([], 0, next_words, 5)
+        third = self.haiku_line([], 0, next_words, 5, [first[-1], second[-1]])
         haiku = haiku + ' '.join(third) + '\n'
         return haiku
 
@@ -127,5 +145,6 @@ class PoemGenerator():
 if __name__ == '__main__':
     generator = PoemGenerator(nltk.corpus.gutenberg)
     #generator.generate_poem()
-    generator.generate_haiku()
+    print(generator.generate_haiku())
     #generator.generate_endless_poem(None)
+    import ipdb; ipdb.set_trace()  # BREAKPOINT
