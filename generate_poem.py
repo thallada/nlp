@@ -103,10 +103,14 @@ class PoemGenerator():
         haiku = haiku + ' '.join(first) + '\n'
         next_words = [freq[0] for freq in self.cfd[first[-1]].items()
                       if not self.only_punctuation.match(freq[0])]
+        if not next_words:
+            next_words = self.all_words
         second = self.haiku_line([], 0, next_words, 7)
         haiku = haiku + ' '.join(second) + '\n'
         next_words = [freq[0] for freq in self.cfd[second[-1]].items()
                       if not self.only_punctuation.match(freq[0])]
+        if not next_words:
+            next_words = self.all_words
         third = self.haiku_line([], 0, next_words, 5)
         haiku = haiku + ' '.join(third) + '\n'
         return haiku
