@@ -5,6 +5,7 @@ import pickle
 import random
 import re
 import codecs
+import sys
 from nltk.tree import Tree
 from collections import defaultdict
 from tqdm import tqdm
@@ -28,13 +29,13 @@ Tree.__hash__ = tree_hash
 # corpora. Shitty bus wifi makes it hard to download spacy data and look up the docs.
 
 
-def generate():
+def generate(filename):
     global syntaxes
     parser = Parser()
     if not os.path.exists(SYNTAXES_FILE):
         #  sents = nltk.corpus.gutenberg.sents('results.txt')
         # NOTE: results.txt is a big file of raw text not included in source control, provide your own corpus.
-        with codecs.open('results.txt', encoding='utf-8') as corpus:
+        with codecs.open(filename, encoding='utf-8') as corpus:
             sents = nltk.sent_tokenize(corpus.read())
             sents = [sent for sent in sents if len(sent) < 150][0:1500]
             for sent in tqdm(sents):
@@ -50,8 +51,7 @@ def generate():
             syntaxes = pickle.load(pickle_file)
 
     if not os.path.exists(CFDS_FILE):
-        #  corpus = nltk.corpus.gutenberg.raw('results.txt')
-        with codecs.open('results.txt', encoding='utf-8') as corpus:
+        with codecs.open(filename, encoding='utf-8') as corpus:
             cfds = [make_cfd(corpus.read(), i, exclude_punctuation=False, case_insensitive=True) for i in range(2, 5)]
             with open(CFDS_FILE, 'wb+') as pickle_file:
                 pickle.dump(cfds, pickle_file)
@@ -165,4 +165,4 @@ def get_most_common(search, cfds, most_common=None):
 
 
 if __name__ == '__main__':
-    generate()
+    generate(sys.argv[1])
