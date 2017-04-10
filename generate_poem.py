@@ -13,7 +13,7 @@ from count_syllables import count_syllables
 
 
 class PoemGenerator():
-    def __init__(self, corpus):
+    def __init__(self):
         #self.corpus = 'melville-moby_dick.txt'
         #self.corpus = read_titles()
         #self.sents = corpus.sents(self.corpus)
@@ -71,7 +71,7 @@ class PoemGenerator():
         else:
             print('')
 
-    def generate_poem(self):
+    def generate_text(self):
         #sent = random.choice(self.sents)
         #parsed = self.parser.parse(' '.join(sent))
         word = random.choice(self.bigrams)[0]
@@ -139,7 +139,7 @@ class PoemGenerator():
 
 
 if __name__ == '__main__':
-    generator = PoemGenerator('poop')
+    generator = PoemGenerator()
     #generator.generate_poem()
     haiku = generator.generate_haiku()
     print haiku
