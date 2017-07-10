@@ -1,11 +1,12 @@
 click==6.7
 Flask==0.12.2
+gunicorn==19.7.1
 inflect==0.2.5
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 nltk==3.2.4
-pyStatParser==0.0.1
+# pyStatParser==0.0.1 manually install from git repo (python2 only)
 six==1.10.0
 tqdm==4.14.0
 Werkzeug==0.12.2

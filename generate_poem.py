@@ -33,31 +33,31 @@ class PoemGenerator():
         self.words = []
         self.all_words = []
         self.inflect_engine = inflect.engine()
-        #  with open('/var/www/buzzfeed-haiku-generator/buzzfeed_facebook_statuses.csv', newline='', encoding='utf-8') as statuses:
-            #  reader = csv.reader(statuses, delimiter=',')
-            #  for row in reader:
-                #  if 'via buzzfeed ' not in row[1].lower():  # only English
-                    #  # split title into a list of words and punctuation
-                    #  title = self.spaces_and_punctuation.findall(row[2])
-                    #  # spell out digits into ordinal words for syllable counting
-                    #  title = [string.capwords(
-                             #  self.inflect_engine.number_to_words(int(word)))
-                             #  if word.isdigit() else word for word in title]
-                    #  self.sents.append(title)
-                    #  self.words.extend(title)
-                    #  # all_words only contains words, no punctuation
-                    #  self.all_words.extend([word for word in title
-                                           #  if not
-                                           #  self.only_punctuation.match(word)])
-        with codecs.open('trump.txt', 'r', 'utf-8') as corpus:
-            text = corpus.read()
-            sents = nltk.tokenize.sent_tokenize(text)
-            words = nltk.tokenize.word_tokenize(text)
-            self.sents.extend(sents)
-            self.words.extend(words)
-            self.all_words.extend([word for word in words
-                                   if not
-                                   self.only_punctuation.match(word)])
+        with open('buzzfeed_facebook_statuses.csv', newline='', encoding='utf-8') as statuses:
+            reader = csv.reader(statuses, delimiter=',')
+            for row in reader:
+                if 'via buzzfeed ' not in row[1].lower():  # only English
+                    # split title into a list of words and punctuation
+                    title = self.spaces_and_punctuation.findall(row[2])
+                    # spell out digits into ordinal words for syllable counting
+                    title = [string.capwords(
+                             self.inflect_engine.number_to_words(int(word)))
+                             if word.isdigit() else word for word in title]
+                    self.sents.append(title)
+                    self.words.extend(title)
+                    # all_words only contains words, no punctuation
+                    self.all_words.extend([word for word in title
+                                           if not
+                                           self.only_punctuation.match(word)])
+        #  with codecs.open('trump.txt', 'r', 'utf-8') as corpus:
+            #  text = corpus.read()
+            #  sents = nltk.tokenize.sent_tokenize(text)
+            #  words = nltk.tokenize.word_tokenize(text)
+            #  self.sents.extend(sents)
+            #  self.words.extend(words)
+            #  self.all_words.extend([word for word in words
+                                   #  if not
+                                   #  self.only_punctuation.match(word)])
         self.bigrams = list(nltk.bigrams(self.words))
         self.cfd = nltk.ConditionalFreqDist(self.bigrams)
         #self.parser = Parser()
@@ -142,5 +142,5 @@ if __name__ == '__main__':
     generator = PoemGenerator()
     #generator.generate_poem()
     haiku = generator.generate_haiku()
-    print haiku
+    print(haiku)
     #generator.generate_endless_poem(None)
