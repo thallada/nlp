@@ -3,37 +3,53 @@ import nltk
 import random
 import re
 import string
-#import pickle
 import csv
 import inflect
 from count_syllables import count_syllables
-#from get_titles import read_titles
-#from nltk.corpus import cmudict
-#from stat_parser import Parser
 
 
-class PoemGenerator():
-    def __init__(self):
-        #self.corpus = 'melville-moby_dick.txt'
-        #self.corpus = read_titles()
-        #self.sents = corpus.sents(self.corpus)
-        #self.words = corpus.words(self.corpus)
-        #self.bigrams = list(nltk.bigrams(self.corpus))
+class PoemGenerator(object):
+    def __init__(self, corpus='buzzfeed_facebook_statues.csv'):
         self.only_punctuation = re.compile(r'[^\w\s]+$')
         self.spaces_and_punctuation = re.compile(r"[\w']+|[.,!?;]")
-        #self.all_words = [bigram[0] for bigram in self.bigrams
-                          #if not self.only_punctuation.match(bigram[0])]
-        #self.cfd = nltk.ConditionalFreqDist(self.bigrams)
-        #cfds_file = 'cfds.p'
-        #with open(cfds_file, 'rb') as cfds_file:
-            #self.cfds = pickle.load(cfds_file)
-        #self.cfd = self.cfds[0]
-        #self.all_words = list(self.cfd.keys())
         self.sents = []
         self.words = []
         self.all_words = []
         self.inflect_engine = inflect.engine()
-        with open('buzzfeed_facebook_statuses.csv', newline='', encoding='utf-8') as statuses:
+        self.read_corpus(corpus)
+        self.bigrams = list(nltk.bigrams(self.words))
+        self.cfd = nltk.ConditionalFreqDist(self.bigrams)
+        self.history = []
+
+    def read_corpus(self, corpus):
+        """Given filename of corpus, populate words, all_words, and sents."""
+        if corpus.endswith('.csv'):
+            if 'buzzfeed_facebook_statuses' in corpus:
+                return self.read_buzzfeed_corpus(corpus)
+            else:
+                return self.read_csv_corpus(corpus)
+        elif corpus.endswith('.txt'):
+            return self.read_txt_corpus(corpus)
+        else:
+            raise TypeError(('Unrecognized corpus file type: %s.' % corpus) +
+                            '".txt" and ".csv" are only supported')
+
+    def read_txt_corpus(self, corpus):
+        with codecs.open(corpus, 'r', 'utf-8') as corpus_content:
+            text = corpus_content.read()
+            sents = nltk.tokenize.sent_tokenize(text)
+            words = nltk.tokenize.word_tokenize(text)
+            self.sents.extend(sents)
+            self.words.extend(words)
+            self.all_words.extend([word for word in words
+                                   if not
+                                   self.only_punctuation.match(word)])
+
+    def read_csv_corpus(self, corpus):
+        raise NotImplementedError('Haven\'t implemented generic csv reading')
+
+    def read_buzzfeed_corpus(self, corpus):
+        with open(corpus, newline='', encoding='utf-8') as statuses:
             reader = csv.reader(statuses, delimiter=',')
             for row in reader:
                 if 'via buzzfeed ' not in row[1].lower():  # only English
@@ -49,19 +65,6 @@ class PoemGenerator():
                     self.all_words.extend([word for word in title
                                            if not
                                            self.only_punctuation.match(word)])
-        #  with codecs.open('trump.txt', 'r', 'utf-8') as corpus:
-            #  text = corpus.read()
-            #  sents = nltk.tokenize.sent_tokenize(text)
-            #  words = nltk.tokenize.word_tokenize(text)
-            #  self.sents.extend(sents)
-            #  self.words.extend(words)
-            #  self.all_words.extend([word for word in words
-                                   #  if not
-                                   #  self.only_punctuation.match(word)])
-        self.bigrams = list(nltk.bigrams(self.words))
-        self.cfd = nltk.ConditionalFreqDist(self.bigrams)
-        #self.parser = Parser()
-        self.history = []
 
     def markov(self, word, n):
         if n > 0:
@@ -72,8 +75,6 @@ class PoemGenerator():
             print('')
 
     def generate_text(self):
-        #sent = random.choice(self.sents)
-        #parsed = self.parser.parse(' '.join(sent))
         word = random.choice(self.bigrams)[0]
         self.markov(word, 15)
 
@@ -139,8 +140,6 @@ class PoemGenerator():
 
 
 if __name__ == '__main__':
-    generator = PoemGenerator()
-    #generator.generate_poem()
+    generator = PoemGenerator(corpus='buzzfeed_facebook_statuses.csv')
     haiku = generator.generate_haiku()
     print(haiku)
-    #generator.generate_endless_poem(None)
